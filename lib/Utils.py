@@ -1,39 +1,5 @@
 import numpy as np
 
-##### convert to img : fast version
-def convert_to_img(mat, color_table = None, return_color_table = False):
-  im_mat = np.ones((mat.shape[1], mat.shape[0], 3))
-  if color_table is None:
-    colors = np.array([[0,0.2,0.4,0.6,0.8], [0,0.2,0.4,0.6,0.8], [0, 0.2, 0.4, 0.6,0.8]])    
-    np.random.shuffle(colors[0])
-    np.random.shuffle(colors[1])
-    np.random.shuffle(colors[2])
-  else:
-    colors = color_table
-    
-#   print(f'convert_to_img : colors = \n{colors}')
-  
-  area_cnt = np.max(mat)
-  for area_num in range(1, min(area_cnt, colors.shape[1] ** 3) + 1):
-    tmp = area_num-1
-    r = tmp%colors.shape[1]
-    tmp = tmp//colors.shape[1]
-    g = tmp%colors.shape[1]
-    tmp = tmp//colors.shape[1]
-    b = tmp%colors.shape[1]
-    color = [colors[0,r], colors[1,g], colors[2,b]]
-    
-    #영역이 area_num인 곳을 추출함
-    #(x,y) 형태인 것을 (y(::-1), x) 형태로 치환해야 이미지 출력시 왜곡안됨
-    mask = np.transpose((mat == area_num), [1,0])
-    mask = mask[::-1, :]
-    im_mat[mask] = color
-    
-  if return_color_table:
-    return im_mat, colors
-  else:
-    return im_mat
-
 #초기 gis data 불러오고 처리하는 작업을 행렬 shape가 (x, y) 형태여서,
 #일반적인 형태(y,x)로 변환해주는 함수를 사용함
 def convert_axis(mat):
@@ -111,7 +77,6 @@ def get_coastline_cells(mat):
   return result
 
 def to_img(mat, center, interval):
-  #to_table image버전
   sedi_mat = np.zeros_like(mat)
   for r in range(mat.shape[0]):
     for c in range(mat.shape[1]):
@@ -122,8 +87,6 @@ def to_img(mat, center, interval):
   im_mat = np.ones((mat.shape[0], mat.shape[1], 3))
   colors = [[160/255, 160/255, 160/255], [0, 51/255, 102/255], [0, 76/255, 153/255], [0, 102/255, 204/255], [0, 128/255, 1], [51/255, 153/255, 1], [102/255, 178/255, 1],
             [1, 178/255, 102/255], [1, 178/255, 102/255], [1, 178/255, 102/255], [1, 178/255, 102/255], [1, 178/255, 102/255], [1, 178/255, 102/255]]
-  # colors = [[160/255, 160/255, 160/255], [0, 51/255, 102/255], [0, 76/255, 153/255], [0, 102/255, 204/255], [0, 128/255, 1], [51/255, 153/255, 1], [102/255, 178/255, 1],
-  #           [1, 178/255, 102/255], [1, 153/255, 51/255], [1, 128/255, 0], [204/255, 102/255, 0], [153/255, 76/255, 0], [102/255, 51/255, 0]]
   r = [center] * 13
   for i in range(5):
     r[6 - i] = center - interval * i
@@ -139,26 +102,6 @@ def to_img(mat, center, interval):
   im_mat[mask] = colors[12]
 
   return im_mat
-  # area_cnt = np.max(mat)
-  # for area_num in range(1, min(area_cnt, colors.shape[1] ** 3) + 1):
-  #   tmp = area_num-1
-  #   r = tmp%colors.shape[1]
-  #   tmp = tmp//colors.shape[1]
-  #   g = tmp%colors.shape[1]
-  #   tmp = tmp//colors.shape[1]
-  #   b = tmp%colors.shape[1]
-  #   color = [colors[0,r], colors[1,g], colors[2,b]]
-    
-  #   #영역이 area_num인 곳을 추출함
-  #   #(x,y) 형태인 것을 (y(::-1), x) 형태로 치환해야 이미지 출력시 왜곡안됨
-  #   mask = np.transpose((mat == area_num), [1,0])
-  #   mask = mask[::-1, :]
-  #   im_mat[mask] = color
-    
-  # if return_color_table:
-  #   return im_mat, colors
-  # else:
-  #   return im_mat
 
 def marking_active_cells(im_mat, params):
   im_mat[params["active_cells"]] = [1, 102/255, 102/255]
@@ -166,9 +109,6 @@ def marking_active_cells(im_mat, params):
 
 def marking_coastline_cells(im_mat, coastline_cells, size = 1, color=[1,0,0]):
   target_list = list(coastline_cells)
-  # marking_range = ((size * 2) - 1)
-  # print(f"marking_range = {marking_range}")
-  # colors = np.zeros((marking_range, marking_range, 3))
 
   for r, c in target_list:
     sr = r - (size - 1)
