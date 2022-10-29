@@ -1,4 +1,7 @@
 def ReadConfig(filepath):
+    def bit2int(x):
+        return int(x, 2)
+
     args = {
         "cell_length": [int, "cell_length", None],
         "coast_height": [int, "coast_height", None],
@@ -7,7 +10,7 @@ def ReadConfig(filepath):
         "allow_angle": [float, "allow_angle", None],
         "wave_energy_avg": [float, "wave_energy_avg", None],
         "wave_energy_target": [float, "wave_energy_target", None],
-        "default_wave_dir": [int, "default_wave_dir", None],
+        "default_wave_dir": [bit2int, "default_wave_dir", None],
         "s2tr": [float, "beta", None],
         "reverse_drop": [float, "theta", None],
         "default_drop": [float, "epsilon", None],
@@ -29,7 +32,7 @@ def ReadConfig(filepath):
             if not line:
                 break
             words = line.split()
-            if len(words < 3):
+            if len(words) < 3:
                 continue
             if words[0] != "set":
                 continue
@@ -68,6 +71,5 @@ if __name__ == "__main__":
     is_success, msg = ReadConfig(filepath)
     if is_success:
         print(f":: Read Config is Success!")
-        print(msg)
     else:
         print(f":: Read Config is Failed...\n{msg}")

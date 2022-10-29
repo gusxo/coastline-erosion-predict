@@ -7,7 +7,7 @@ then
     exit 1
 fi
 rm $1
-echo "\
+echo -e "\
 #parameters file\n\
 #파라미터 값 작성법 : set <param_name> <value>\n\
 #set으로 시작하지 않는 줄은 무시됨.\n\
@@ -38,7 +38,6 @@ set wave_energy_avg 0.1\n\
 set wave_energy_target 0.5\n\
 \n\
 #default_wave_dir : 기본 파도방향을 지정함.\n\
-#   None = 모든 외각 셀들이 중심 방향으로 파도를 보냄\n\
 #   bitmask value = 0bxxxx 으로 8방향을 표현함. 왼쪽 비트부터 북/서/남/동 플래그\n\
 #                   예를 들어 0b0001은 서쪽 외각 셀들에 동쪽으로 파도를 보내게 설정함.\n\
 #                   예를 들어 0b1100은 동쪽과 남쪽 외각 셀들에 북서쪽으로 파도를 보내게 설정함.\n\
