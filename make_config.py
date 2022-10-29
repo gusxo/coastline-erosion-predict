@@ -50,6 +50,9 @@ set default_wave_dir 0b0110
 #이 값에 비례해서 침식 비율(값)이 결정됩니다.
 set s2tr 0.08
 
+#alpha_weight : 침식값 가중치(배율)
+set alpha_weight 1.2
+
 #reverse_drop : 운송물 진행방향이 파도방향과 일치하지 않을시, 추가 추락비율
 set reverse_drop 0.03
 

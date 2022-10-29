@@ -19,6 +19,7 @@ def ReadConfig(filepath):
         "exp_hb": [float, "exp_hb", None],
         "exp_f": [float, "exp_f", None],
         "exp_gamma": [float, "exp_gamma", None],
+        "alpha_weight":[float, "alpha_weight", None],
     }
 
     try:
