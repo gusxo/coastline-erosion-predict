@@ -41,11 +41,11 @@ def calculate_parameters(parameters):
     return result
 
 def ReadAndInitParmas(filepath):
-    is_success, result = ReadConfig(filepath)
+    is_success, msg_or_parmas = ReadConfig(filepath)
     if not is_success:
-        return False, result
+        return False, msg_or_parmas
 
-    inited_params = calculate_parameters(result)
+    inited_params = calculate_parameters(msg_or_parmas)
     return True, inited_params
 
 if __name__ == "__main__":

@@ -1,5 +1,5 @@
 def ReadConfig(filepath):
-    def bit2int(x):
+    def bitmask(x):
         return int(x, 2)
 
     args = {
@@ -10,7 +10,7 @@ def ReadConfig(filepath):
         "allow_angle": [float, "allow_angle", None],
         "wave_energy_avg": [float, "wave_energy_avg", None],
         "wave_energy_target": [float, "wave_energy_target", None],
-        "default_wave_dir": [bit2int, "default_wave_dir", None],
+        "default_wave_dir": [bitmask, "default_wave_dir", None],
         "s2tr": [float, "beta", None],
         "reverse_drop": [float, "theta", None],
         "default_drop": [float, "epsilon", None],
@@ -19,7 +19,7 @@ def ReadConfig(filepath):
         "exp_hb": [float, "exp_hb", None],
         "exp_f": [float, "exp_f", None],
         "exp_gamma": [float, "exp_gamma", None],
-        "alpha_weight":[float, "alpha_weight", None],
+        "alpha_weight": [float, "alpha_weight", None],
     }
 
     try:
