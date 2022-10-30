@@ -1,4 +1,6 @@
 import numpy as np
+import os
+from PIL import Image
 
 #초기 gis data 불러오고 처리하는 작업을 행렬 shape가 (x, y) 형태여서,
 #일반적인 형태(y,x)로 변환해주는 함수를 사용함
@@ -242,9 +244,53 @@ def weight_to_img(mat):
 
   return im_mat
 
-def save_matrix(filepath, mat, parmas):
-  return
-
+def save_matrix(filepath, mat):
+  try:
+    np.save(f"{filepath}", mat)
+  except Exception as e:
+    return False, f"save matrix : save failed : {e}"
+  return True, None
 
 def load_matrix(filepath):
-  return
+  try:
+    mat = np.load(f'{filepath}', allow_pickle=True)
+  except Exception as e:
+    return False, f"load matrix : load failed : {e}"
+  return True, mat
+
+def save_inited_matrix(dir, mat, params, coastlines):
+  try:
+    #디렉토리 확인 후 생성
+    if not os.path.isdir(f'{dir}'):
+      os.makedirs(f'{dir}')
+    np.save(f"{dir}/mat", mat)
+    np.save(f"{dir}/params", [params])
+    np.save(f"{dir}/coastlines", [coastlines])
+  except Exception as e:
+    return False, f"save inited matrix : save failed : {e}"
+  return True, None
+
+def load_inited_matrix(dir):
+  try:
+    mat = np.load(f'{dir}/mat.npy', allow_pickle=True)
+    params = np.load(f'{dir}/mat.npy', allow_pickle=True)[0]
+    coastlines = np.load(f'{dir}/mat.npy', allow_pickle=True)[0]
+  except Exception as e:
+    return False, f"load inited matrix : load failed : {e}"
+  return True, (mat, params, coastlines)
+
+def save_imgs(dir, filenames, imgs):
+  try:
+    filecnt = len(filenames)
+    imgcnt = len(imgs)
+    if filecnt != imgcnt:
+      return False, f"save visualized images : save failed : unmatch filenames length & imgs length"
+    #디렉토리 확인 후 생성
+    if not os.path.isdir(f'{dir}'):
+      os.makedirs(f'{dir}')
+    for i in range(filecnt):
+      im = Image.fromarray(imgs[i])
+      im.save(f"{dir}/{filenames[i]}.png")
+  except Exception as e:
+    return False, f"save visualized images : save failed : {e}"
+  return True, None

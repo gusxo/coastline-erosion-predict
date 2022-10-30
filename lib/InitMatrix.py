@@ -223,9 +223,6 @@ def init_active_cells(mat,parameters, coastline_cells):
 
 ### 지도 초기화
 def matrix_init(mat, parameters):
-  #파라미터 추가 초기화
-  parameters["coastline_cells"] = set()
-
   ##### find coastline cell & init sediments value #####  
   # 해안선 위치의 퇴적물값
   coastline_cell_sediments = int(parameters["max_depth"])
@@ -258,7 +255,6 @@ def matrix_init(mat, parameters):
         #지상 셀 방향으로는 최소값이 유효하고, 바다 셀 방향으로는 최대값이 유효함.
         if flag:
           mat[r,c]["sediments"] = coastline_cell_sediments
-          parameters["coastline_cells"].add((r,c))
           for i in range(4):
             if neighboors[i] is None:
               continue
@@ -354,9 +350,6 @@ def map_downsize(mat, parameters):
   new_param["epsilon"] = new_param["epsilon"] * (1000 / new_param["cell_length"])
   new_param["cell_length"] *= 2
   new_param = calculate_parameters(new_param)
-
-  #맵이 작아지면 기존의 coastline_cells 마킹은 유효하지않음. 다 날림.
-  new_param["coastline_cells"] = set()
   
   #새로운 매트릭스 생성
   result = np.zeros((m,n)).astype(mat.dtype)
@@ -414,19 +407,5 @@ def map_downsize(mat, parameters):
       #case들에 따라 결정된 value를 실제 위치에 대입
       result[r,c] = value
 
-  #대입 끝, 해안선셀 찾아줌
-  for r in range(m):
-    for c in range(n):
-      if result[r,c]["state"] == "ground":
-        #지상 셀일 경우, 이웃을 다 가져와 바다 셀이 있는지 확인함.
-        neighboors = get_neighboor(result, r, c, 0b1111)
-        flag = False
-        for neighboor in neighboors:
-          if neighboor is not None:
-            if neighboor["state"] == "sea":
-              flag = True
-        if flag:
-          new_param["coastline_cells"].add((r,c))
-  
   return result, new_param
 
