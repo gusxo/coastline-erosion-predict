@@ -143,7 +143,7 @@ if __name__ == "__main__":
 
     #save - visualize
     if args.visualize:
-        is_success, msg = save_mat_with_visualize(save_dir, mat, params, init_coastlines)
+        is_success, msg = save_mat_with_visualize(save_dir, inited_matrix, params, init_coastlines)
         if not is_success:
             print(f"error : {msg}\n이미지 파일 저장에 실패했습니다.")
             exit()

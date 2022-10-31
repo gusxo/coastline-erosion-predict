@@ -272,8 +272,8 @@ def save_inited_matrix(dir, mat, params, coastlines):
 def load_inited_matrix(dir):
   try:
     mat = np.load(f'{dir}/mat.npy', allow_pickle=True)
-    params = np.load(f'{dir}/mat.npy', allow_pickle=True)[0]
-    coastlines = np.load(f'{dir}/mat.npy', allow_pickle=True)[0]
+    params = np.load(f'{dir}/params.npy', allow_pickle=True)[0]
+    coastlines = np.load(f'{dir}/coastlines.npy', allow_pickle=True)[0]
   except Exception as e:
     return False, f"load inited matrix : load failed : {e}"
   return True, (mat, params, coastlines)
