@@ -3,19 +3,19 @@ from tqdm import tqdm
 
 import os, sys
 from os.path import dirname, join, abspath
-sys.path.insert(0, abspath(join(dirname(__file__), '../lib')))
+sys.path.insert(0, abspath(join(dirname(__file__), "../lib")))
 from InitParams import ReadAndInitParmas
 from InitMatrix import to_object_type, wave_weight_recv, wave_weight_send, init_active_cells, matrix_init, map_downsize
 from Utils import convert_axis, to_img, marking_active_cells, get_coastline_cells, marking_coastline_cells, weight_to_img, load_matrix, load_inited_matrix, save_inited_matrix, save_imgs
 
 desc = "details"
-usage_msg = f"{sys.argv[0]} [-s SAVE_DIR] (-m MATRIX_FILE -c CONFIG_FILE [-d DOWNSIZE_COUNT] | -l LOAD_DIR) [-w LOOP_RATE] [-v]"
+usage_msg = f"{sys.argv[0]} (-m MATRIX_FILE -c CONFIG_FILE [-d DOWNSIZE_COUNT] | -l LOAD_DIR) [-w LOOP_RATE] [-s SAVE_DIR] [--store_images]"
 parser = argparse.ArgumentParser(description=desc, usage=usage_msg,
 formatter_class=argparse.RawTextHelpFormatter)
 
-parser.add_argument("-s", "--save", dest="save_dir", action="store", default="./result", help="""
+parser.add_argument("-s", "--save", dest="save_dir", action="store", default="matrix_init_result", help="""
 결과가 저장될 디렉토리
-기본값 : ./result
+기본값 : matrix_init_result
 
 """)
 parser.add_argument("-l", "--load", dest="load_dir", action="store", help="""
@@ -46,7 +46,7 @@ parser.add_argument("-w", "--wave_init", dest="loop_rate", action="store", type=
 
 """)
 
-parser.add_argument("-v", "--visualize", dest="visualize", action="store_true", help="""
+parser.add_argument("--store_images", dest="visualize", action="store_true", help="""
 결과를 저장할 때, 결과 행렬의 시각화 이미지를 같이 저장할지 여부
 저장되는 이미지 리스트 : 
 - matrix : 지도를 표시합니다.
@@ -125,11 +125,13 @@ for i in tqdm(range(wave_init_loop_cnt)):
 
 #save
 save_dir = args.save_dir
+add_index = 1
 while(True):
     is_success, msg = save_inited_matrix(save_dir, inited_mat, params, init_coastlines)
     if not is_success:
         print(f"error : {msg}\n결과 파일 저장에 실패했습니다.")
-        save_dir += ".tmp"
+        save_dir = f"{args.save_dir}({add_index})"
+        add_index += 1
         print(f"다음 디렉토리에 재시도합니다 : {save_dir}")
     else:
         print(f"결과 파일 저장에 성공했습니다. : {save_dir}")
