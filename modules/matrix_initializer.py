@@ -6,7 +6,7 @@ from os.path import dirname, join, abspath
 sys.path.insert(0, abspath(join(dirname(__file__), "../lib")))
 from InitParams import ReadAndInitParmas
 from InitMatrix import to_object_type, wave_weight_recv, wave_weight_send, init_active_cells, matrix_init, map_downsize
-from Utils import convert_axis, to_img, marking_active_cells, get_coastline_cells, marking_coastline_cells, weight_to_img, load_matrix, load_inited_matrix, save_inited_matrix, save_imgs
+from Utils import convert_axis, get_coastline_cells, load_matrix, load_inited_matrix, save_inited_matrix, save_mat_with_visualize
 
 desc = "details"
 usage_msg = f"{sys.argv[0]} (-m MATRIX_FILE -c CONFIG_FILE [-d DOWNSIZE_COUNT] | -l LOAD_DIR) [-w LOOP_RATE] [-s SAVE_DIR] [--store_images]"
@@ -63,7 +63,13 @@ if args.load_dir is None and (args.config_file is None or args.matrix_file is No
     print(f"usage: {usage_msg}")
     print(f"error : -m 옵션과 -c 옵션 둘 다 제공되거나, -l 옵션을 사용해야 합니다.\n자세한 내용은 -h 또는 --help 옵션을 사용하세요.")
     exit()
-
+#숫자 옵션들 음수일 경우 에러
+if args.downsize_count < 0:
+    print(f"error : (-d | --downsize) arguments must at least 0, but input is {args.downsize_count}")
+    exit()
+if args.loop_rate < 0.0:
+    print(f"error : (-w | --wave_init) arguments must at least 0, but input is {args.loop_rate}")
+    exit()
 
 
 #LOAD_DIR 옵션이 있을 경우, 로드 시도
@@ -126,26 +132,16 @@ for i in tqdm(range(wave_init_loop_cnt)):
 
 #save
 save_dir = args.save_dir
-add_index = 1
-while(True):
-    is_success, msg = save_inited_matrix(save_dir, inited_matrix, params, init_coastlines)
-    if not is_success:
-        print(f"error : {msg}\n결과 파일 저장에 실패했습니다.")
-        save_dir = f"{args.save_dir}({add_index})"
-        add_index += 1
-        print(f"다음 디렉토리에 재시도합니다 : {save_dir}")
-    else:
-        print(f"결과 파일 저장에 성공했습니다. : {save_dir}")
-        break
+is_success, msg = save_inited_matrix(save_dir, inited_matrix, params, init_coastlines)
+if not is_success:
+    print(f"error : {msg}\n결과 파일 저장에 실패했습니다.")
+else:
+    print(f"결과 파일 저장에 성공했습니다. : {save_dir}")
 
 #save - visualize
 if args.visualize:
-    img_mat = to_img(inited_matrix, params["max_depth"], params["max_depth"]//6)
-    img_active_cells = marking_active_cells(to_img(inited_matrix,params["max_depth"], params["max_depth"]//6),params)
-    img_coastline_cells = marking_coastline_cells(to_img(inited_matrix,params["max_depth"], params["max_depth"]//6),init_coastlines, size=3)
-    img_weight = weight_to_img(inited_matrix)
-    imgs = [img_mat, img_active_cells, img_coastline_cells, img_weight]
-    names = ["matrix", "matrix_active_cells", "matrix_coastline_cells", "matrix_weight"]
-    is_success, msg = save_imgs(save_dir, names, imgs)
+    is_success, msg = save_mat_with_visualize(save_dir, mat, params, init_coastlines)
     if not is_success:
         print(f"error : {msg}\n이미지 파일 저장에 실패했습니다.")
+    else:
+        print(f"이미지 파일 저장에 성공했습니다. : {save_dir}")

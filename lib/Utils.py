@@ -293,3 +293,12 @@ def save_imgs(dir, filenames, imgs):
   except Exception as e:
     return False, f"save visualized images : save failed : {e}"
   return True, None
+
+def save_mat_with_visualize(dir, mat, params, init_coastlines):
+    img_mat = to_img(mat, params["max_depth"], params["max_depth"]//6)
+    img_active_cells = marking_active_cells(to_img(mat,params["max_depth"], params["max_depth"]//6),params)
+    img_coastline_cells = marking_coastline_cells(to_img(mat,params["max_depth"], params["max_depth"]//6),init_coastlines, size=3)
+    img_weight = weight_to_img(mat)
+    imgs = [img_mat, img_active_cells, img_coastline_cells, img_weight]
+    names = ["matrix", "matrix_active_cells", "matrix_coastline_cells", "matrix_weight"]
+    return save_imgs(dir, names, imgs)
