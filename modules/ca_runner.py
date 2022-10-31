@@ -1,6 +1,7 @@
 if __name__ == "__main__":
     import argparse
     from tqdm import tqdm
+    import numpy as np
 
     import os, sys
     from os.path import dirname, join, abspath
