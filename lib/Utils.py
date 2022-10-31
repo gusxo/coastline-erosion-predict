@@ -233,7 +233,6 @@ def weight_to_img(mat):
   r = [-1] * len(colors)
   for i in range(len(colors) - 1):
     r[i+1] = 50 * i
-  print(r)
 
   for i in range(len(colors) - 1):
     mask = (w_mat >= r[i]) &  ( w_mat < r[i+1])
@@ -289,7 +288,7 @@ def save_imgs(dir, filenames, imgs):
     if not os.path.isdir(f'{dir}'):
       os.makedirs(f'{dir}')
     for i in range(filecnt):
-      im = Image.fromarray(imgs[i])
+      im = Image.fromarray((imgs[i] * 255).astype(np.uint8))
       im.save(f"{dir}/{filenames[i]}.png")
   except Exception as e:
     return False, f"save visualized images : save failed : {e}"

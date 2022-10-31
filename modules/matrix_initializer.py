@@ -72,7 +72,7 @@ if args.load_dir is not None:
     if not is_success:
         print(f"error : {msg_or_data}\n초기화 완료된 지도 불러오기에 실패하였습니다.")
         exit()
-    inited_mat = msg_or_data[0]
+    inited_matrix = msg_or_data[0]
     params = msg_or_data[1]
     init_coastlines = msg_or_data[2]
     print(f"초기화된 지도 불러오기에 성공하였습니다.")
@@ -89,6 +89,7 @@ else:
         print(f"error : {msg_or_data}\지도 파일 불러오기에 실패하였습니다.")
         exit()
     mat = msg_or_data
+    print(f"파일 불러오기에 성공하였습니다.")
 
     try:
         #init matrix
@@ -98,9 +99,9 @@ else:
         origin_shape = inited_matrix.shape
         predicted_shape = origin_shape
         for i in range(args.downsize_count):
-            predicted_shape = (predicted_shape[0] // 2, predicted_shape[1] // 2)
-        if (predicted_shape[0] == 0 or predicted_shape[1] == 0) and args.downsize_count:
-            print(f"error : too much downsizing : origin shape is {origin_shape}, downsizing result shape is {predicted_shape}\n너무 많이 downsizing 하여 행/열 중 하나의 길이가 0이 되었습니다. downsizing 횟수를 줄여주세요.")
+            predicted_shape = ((predicted_shape[0] + 1)// 2, (predicted_shape[1] + 1)// 2)
+        if (predicted_shape[0] < 10 or predicted_shape[1] < 10) and args.downsize_count:
+            print(f"error : too much downsizing : origin shape is {origin_shape}, downsizing result shape is {predicted_shape}\n너무 많이 downsizing 하여 행/열 중 하나의 길이가 10 이하가 되었습니다. downsizing 횟수를 줄여주세요.")
             exit()
         elif (predicted_shape[0] < 100 or predicted_shape[1] < 100) and args.downsize_count:
             print(f"warning : origin shape is {origin_shape}, downsizing result shape is {predicted_shape}\n경고 : 지도를 너무 작게 줄이는 것은 권장하지 않습니다. 이 메시지를 보지 않으려면 downsizing 횟수를 줄여주세요.")
@@ -116,18 +117,18 @@ else:
         exit()
     print(f"지도 초기화에 성공하였습니다.")
 
-wave_init_loop_cnt = (inited_mat.shape[0]+inited_mat.shape[1]) * args.loop_rate
+wave_init_loop_cnt = (inited_matrix.shape[0]+inited_matrix.shape[1]) * args.loop_rate
 wave_init_loop_cnt = int(wave_init_loop_cnt)
 print(f"파도/가중치 초기화를 진행합니다. 루프 횟수 : {wave_init_loop_cnt}회")
 for i in tqdm(range(wave_init_loop_cnt)):
-    wave_weight_recv(inited_mat)
-    wave_weight_send(inited_mat)
+    wave_weight_recv(inited_matrix)
+    wave_weight_send(inited_matrix)
 
 #save
 save_dir = args.save_dir
 add_index = 1
 while(True):
-    is_success, msg = save_inited_matrix(save_dir, inited_mat, params, init_coastlines)
+    is_success, msg = save_inited_matrix(save_dir, inited_matrix, params, init_coastlines)
     if not is_success:
         print(f"error : {msg}\n결과 파일 저장에 실패했습니다.")
         save_dir = f"{args.save_dir}({add_index})"
@@ -139,10 +140,10 @@ while(True):
 
 #save - visualize
 if args.visualize:
-    img_mat = to_img(inited_mat, params["max_depth"], params["max_depth"]//6)
-    img_active_cells = marking_active_cells(to_img(inited_mat,params["max_depth"], params["max_depth"]//6),params)
-    img_coastline_cells = marking_coastline_cells(to_img(inited_mat,params["max_depth"], params["max_depth"]//6),init_coastlines, size=3)
-    img_weight = weight_to_img(inited_mat)
+    img_mat = to_img(inited_matrix, params["max_depth"], params["max_depth"]//6)
+    img_active_cells = marking_active_cells(to_img(inited_matrix,params["max_depth"], params["max_depth"]//6),params)
+    img_coastline_cells = marking_coastline_cells(to_img(inited_matrix,params["max_depth"], params["max_depth"]//6),init_coastlines, size=3)
+    img_weight = weight_to_img(inited_matrix)
     imgs = [img_mat, img_active_cells, img_coastline_cells, img_weight]
     names = ["matrix", "matrix_active_cells", "matrix_coastline_cells", "matrix_weight"]
     is_success, msg = save_imgs(save_dir, names, imgs)

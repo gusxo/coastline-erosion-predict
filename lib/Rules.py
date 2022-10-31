@@ -13,7 +13,7 @@ def calculate_drop_value(sediments_value, init_sediments_value, parameters, wave
   real_min_drop_value = int(parameters["min_drop_weight"] * init_sediments_value * (default_drop_rate + reverse_dir_drop_rate))
   sediments_drop_value = int(sediments_value * (default_drop_rate + reverse_dir_drop_rate))
   
-  drop_value = max([real_min_drop_value, sediments_drop_value])
+  drop_value = max([real_min_drop_value, sediments_drop_value, 1])
   drop_value = min([drop_value, sediments_value])
   
   return (sediments_value - drop_value, drop_value)

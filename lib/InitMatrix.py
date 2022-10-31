@@ -230,7 +230,6 @@ def matrix_init(mat, parameters):
   # 삼각비를 이용하여 셀 1칸 거리를 밑변으로 삼아 높이를 계산
   radian = math.radians(parameters["coast_angle"])
   diff_sediments = int(parameters["cell_length"] * math.tan(radian))
-  print(f"diff_sediments :{diff_sediments}")
   #모든 지상셀 일단 최고높이로 초기화
   for r in range(mat.shape[0]):
     for c in range(mat.shape[1]):
@@ -336,7 +335,6 @@ def matrix_init(mat, parameters):
 def map_downsize(mat, parameters):
   #작아지는 크기에 따른 맵 크기(소수점 올림)
   m,n = (int(math.ceil(mat.shape[0]/2)), int(math.ceil(mat.shape[1]/2)))
-  print(f"new matrix's shape : {m} , {n}")
   
   #새 파라미터 저장소 생성
   new_param = {}
@@ -353,7 +351,6 @@ def map_downsize(mat, parameters):
   
   #새로운 매트릭스 생성
   result = np.zeros((m,n)).astype(mat.dtype)
-  print(result.dtype)
   
   for r in range(m):
     for c in range(n):

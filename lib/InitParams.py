@@ -31,7 +31,7 @@ def calculate_parameters(parameters):
     #max[최소드랍비율 기반 범위, 해빈경사 기반 해저 모래 초기화 거리]
     cnt = 1
     erosion_transports = result["erosion_amount"]
-    erosion_w1_min_drop_value = int((result["theta"] + result["epsilon"]) * erosion_transports * result["min_drop_weight"])
+    erosion_w1_min_drop_value = max([int((result["theta"] + result["epsilon"]) * erosion_transports * result["min_drop_weight"]), 1])
     while erosion_transports > 0:
         erosion_transports -= max([int(erosion_transports* (result["theta"] + result["epsilon"])), erosion_w1_min_drop_value])
         cnt += 1
