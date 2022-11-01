@@ -33,7 +33,8 @@ if __name__ == "__main__":
     """)
     parser.add_argument("-c", "--config", dest="config_file", action="store", help="""
     파라미터 설정이 담긴 파일.
-    check_config.py로 체크 하였을때 성공한 파일이여야 합니다.
+    파일 형식은 make_matrix_config.py로 얻을 수 있습니다.
+    check_matrix_config.py로 체크 하였을때 성공한 파일이여야 합니다.
 
     """)
     parser.add_argument("-d", "--downsize", dest="downsize_count", action="store", type=int, default=0, help="""

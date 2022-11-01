@@ -13,7 +13,7 @@ if __name__ == "__main__":
 
     desc = "details"
     usage_msg = f"{sys.argv[0]} RUN_STEPS LOAD_DIR [-s SAVE_DIR] [--store_images [--line_size LINE_SIZE]] [--save_per_steps SAVE_STEPS]"
-    parser = argparse.ArgumentParser(description=desc,
+    parser = argparse.ArgumentParser(description=desc,usage=usage_msg,
     formatter_class=argparse.RawTextHelpFormatter)
 
     parser.add_argument(dest="run_steps", action="store", type=int, help="""
