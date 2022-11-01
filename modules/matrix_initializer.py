@@ -2,9 +2,7 @@ if __name__ == "__main__":
     import argparse
     from tqdm import tqdm
 
-    import os, sys
-    from os.path import dirname, join, abspath
-    sys.path.insert(0, abspath(join(dirname(__file__), "../lib")))
+    import sys
     from InitParams import ReadAndInitParmas
     from InitMatrix import to_object_type, wave_weight_recv, wave_weight_send, init_active_cells, matrix_init, map_downsize
     from Utils import convert_axis, get_coastline_cells, load_matrix, load_inited_matrix, save_inited_matrix
