@@ -12,7 +12,7 @@ if __name__ == "__main__":
     from ReadConfig import ReadCompareConfig
 
     desc = "details"
-    usage_msg = f"{sys.argv[0]} (-s SAVE_DIR | -p) LOAD_DIR COMPARE_CONFIG"
+    usage_msg = f"{sys.argv[0]} [-h] (-s SAVE_DIR | -p) LOAD_DIR COMPARE_CONFIG"
     parser = argparse.ArgumentParser(description=desc, usage=usage_msg,
     formatter_class=argparse.RawTextHelpFormatter)
 

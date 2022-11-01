@@ -14,7 +14,7 @@ if __name__ == "__main__":
 
     
     desc = "details"
-    usage_msg = f"{sys.argv[0]} (-m MATRIX_FILE -c CONFIG_FILE [-d DOWNSIZE_COUNT] | -l LOAD_DIR) [-w LOOP_RATE] [-s SAVE_DIR] [--store_images [--line_size LINE_SIZE]]"
+    usage_msg = f"{sys.argv[0]} [-h] (-m MATRIX_FILE -c CONFIG_FILE [-d DOWNSIZE_COUNT] | -l LOAD_DIR) [-w LOOP_RATE] [-s SAVE_DIR] [--store_images [--line_size LINE_SIZE]]"
     parser = argparse.ArgumentParser(description=desc, usage=usage_msg,
     formatter_class=argparse.RawTextHelpFormatter)
 

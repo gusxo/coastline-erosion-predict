@@ -15,7 +15,7 @@ if __name__ == "__main__":
     from ReadConfig import ReadCompareConfig
 
     desc = "details"
-    usage_msg = f"{sys.argv[0]} RUN_STEPS LOAD_DIR [-s SAVE_DIR] [--store_images [--line_size LINE_SIZE]] [--compare_coastlines COMPARE_CONFIG] [--save_per_steps SAVE_STEPS]"
+    usage_msg = f"{sys.argv[0]} RUN_STEPS LOAD_DIR [-h] [-s SAVE_DIR] [--store_images [--line_size LINE_SIZE]] [--compare_coastlines COMPARE_CONFIG] [--save_per_steps SAVE_STEPS]"
     parser = argparse.ArgumentParser(description=desc,usage=usage_msg,
     formatter_class=argparse.RawTextHelpFormatter)
 
