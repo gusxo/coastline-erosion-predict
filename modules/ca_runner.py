@@ -56,6 +56,8 @@ if __name__ == "__main__":
     parser.add_argument("--compare_coastlines", dest="COMPARE_CONFIG", action="store", help="""
     해안선 비교 설정 파일을 지정하여, 초기 해안선(지도 초기화 직후)과 CA 적용 후 해안선을 비교합니다.
     SAVE_PER_STEPS 옵션을 같이 지정할 시, 중간 결과 저장시 마다 해안선 비교를 수행합니다.
+    - compare_coastline.png : 비교 이미지
+    - compare_info.txt : 비교이미지의 비교선들의 정보가 적힘
     
     파일 형식은 make_compare_config.py로 얻을 수 있습니다.
     check_compare_config.py로 체크 하였을때 성공한 파일이여야 합니다.
