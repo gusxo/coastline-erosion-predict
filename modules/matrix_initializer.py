@@ -2,6 +2,10 @@ if __name__ == "__main__":
     import argparse
     from tqdm import tqdm
 
+    from os.path import dirname, join, abspath
+    libpath = abspath(join(dirname(__file__), "../lib"))
+    sys.path.insert(0, libpath)
+
     import sys
     from InitParams import ReadAndInitParmas
     from InitMatrix import to_object_type, wave_weight_recv, wave_weight_send, init_active_cells, matrix_init, map_downsize

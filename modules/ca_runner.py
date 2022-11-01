@@ -3,6 +3,10 @@ if __name__ == "__main__":
     from tqdm import tqdm
     import numpy as np
 
+    from os.path import dirname, join, abspath
+    libpath = abspath(join(dirname(__file__), "../lib"))
+    sys.path.insert(0, libpath)    
+
     import sys
     from Rules import rule_main, rule_toppling
     from CellularAutomata import CellularAutomata
