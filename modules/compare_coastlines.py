@@ -7,6 +7,7 @@ if __name__ == "__main__":
     sys.path.insert(0, abspath(join(dirname(__file__), "../lib")))
     from Utils import load_inited_matrix
     from Visualize import get_coastline_gap
+    from ReadConfig import ReadCompareConfig
 
     desc = "details"
     usage_msg = f"{sys.argv[0]} (-s SAVE_DIR | -p) LOAD_DIR COMPARE_CONFIG"
@@ -47,10 +48,19 @@ if __name__ == "__main__":
     #load
     is_success, msg_or_data = load_inited_matrix(args.load_dir)
     if not is_success:
-        print(f"error : {msg_or_data}\n초기화 완료된 지도 불러오기에 실패하였습니다.")
+        print(f"error : {msg_or_data}\n지도 불러오기에 실패하였습니다.")
         exit()
     mat = msg_or_data[0]
     params = msg_or_data[1]
     init_coastlines = msg_or_data[2]
 
-    print(f"초기화된 지도 불러오기에 성공하였습니다.")
+    print(f"지도 불러오기에 성공하였습니다.")
+
+    is_success, msg_or_data = ReadCompareConfig(args.compare_config)
+    if not is_success:
+        print(f"error : {msg_or_data}\n설정 파일 불러오기에 실패하였습니다.")
+        exit()
+    targets = msg_or_data
+
+    print(f"설정 파일 불러오기에 성공하였습니다.")
+

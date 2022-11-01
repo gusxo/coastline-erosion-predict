@@ -67,7 +67,13 @@ def ReadCompareConfig(filepath):
     def bitmask(x):
         return int(x, 2)
 
-    result = []
+    result = [{
+        "line_min_length":0, 
+        "line_size":1, 
+        "before":[1,0,0],
+        "after":[0,1,0],
+        "compare":[1,1,0]
+        }]
 
     try:
         f = open(filepath, "r")
@@ -80,11 +86,47 @@ def ReadCompareConfig(filepath):
             if not line:
                 break
             words = line.split()
-            if len(words) < 5:
+            if len(words) < 3:
                 continue
             if words[0] != "set":
                 continue
             try:
+                #그리기 옵션일경우 별도 처리
+                if words[1] == "line_min_length":
+                    value = int(words[2])
+                    if value < 0:
+                        raise Exception(f"line_min_length는 0 이상을 요구함 : {value}")
+                    result[0]["line_min_length"] = value
+                    continue
+                elif words[1] == "line_size":
+                    value = int(words[2])
+                    if value < 1:
+                        raise Exception(f"line_size는 1 이상을 요구함 : {value}")
+                    result[0]["line_size"] = value
+                    continue
+                elif words[1] == "line_color":
+                    if len(words) < 6:
+                        raise Exception(f"선 색상 지정을 위한 인수가 모두 제공되지 않음 : {line}")
+                    line_type = words[2]
+                    r = int(words[3])
+                    g = int(words[4])
+                    b = int(words[5])
+                    if line_type != "before" and line_type != "after" and line_type != "compare":
+                        raise Exception(f"line_color_type : {line_type}은 유효한 값이 아님")
+                    if r < 0 or r > 255:
+                        raise Exception(f"R color value : 0~255 값이여야함 : {r}")
+                    if g < 0 or g > 255:
+                        raise Exception(f"G color value : 0~255 값이여야함 : {g}")
+                    if b < 0 or b > 255:
+                        raise Exception(f"B color value : 0~255 값이여야함 : {b}")
+                    r = r / 255
+                    g = g / 255
+                    b = b / 255
+                    result[0][line_type] = [r,g,b]
+                    continue
+                #위 목록에 안걸릴 경우, 좌표 입력으로 판단함
+                if len(words) < 5:
+                    raise Exception(f"좌표 입력을 위한 최소한의 인수가 제공되지 않음 : {line}")
                 row = int(words[1])
                 col = int(words[2])
                 if row < 0 and col < 0:
