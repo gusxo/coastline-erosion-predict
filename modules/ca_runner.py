@@ -11,7 +11,8 @@ if __name__ == "__main__":
     from Rules import rule_main, rule_toppling
     from CellularAutomata import CellularAutomata
     from Utils import load_inited_matrix, save_inited_matrix
-    from Visualize import save_mat_with_visualize
+    from Visualize import save_mat_with_visualize, 
+    from ReadConfig import ReadCompareConfig
 
     desc = "details"
     usage_msg = f"{sys.argv[0]} RUN_STEPS LOAD_DIR [-s SAVE_DIR] [--store_images [--line_size LINE_SIZE]] [--save_per_steps SAVE_STEPS]"
@@ -86,6 +87,21 @@ if __name__ == "__main__":
     params["ca_curr_steps"] = curr_steps
 
     print(f"초기화된 지도 불러오기에 성공하였습니다.")
+
+    if args.compare_config is not None:
+        is_success, msg_or_data = ReadCompareConfig(args.compare_config)
+        if not is_success:
+            print(f"error : {msg_or_data}\n해안선 비교 설정 파일 불러오기에 실패하였습니다.")
+            exit()
+        line_min_length = msg_or_data[0]["line_min_length"]
+        line_size = msg_or_data[0]["line_size"]
+        before_color = msg_or_data[0]["before"]
+        after_color = msg_or_data[0]["after"]
+        compare_color = msg_or_data[0]["compare"]
+
+        targets = msg_or_data[1:]
+
+        print(f"해안선 비교 설정 파일 불러오기에 성공하였습니다.")
 
     #CA init
     CA = CellularAutomata()
