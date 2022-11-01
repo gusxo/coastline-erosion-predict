@@ -287,12 +287,12 @@ def coastline_gap_visualize(mat, params, init_coastlines, line_size, line_min_le
       im = Image.fromarray((_ * 255).astype(np.uint8))
       im.save(f"{save_dir}/compare_coastline.png")
     except Exception as e:
-          raise Exception(f"save results images failed : {e}")
+          return False, f"save results images failed : {e}"
     try:
       f = open(f"{save_dir}/compare_info.txt", "w", encoding='utf8')
       f.write(info_txt)
       f.close()
     except Exception as e:
-      raise Exception(f"save results info failed : {e}")
+      return False, f"save results info failed : {e}"
 
-  return _
+  return True, (_, info_txt)

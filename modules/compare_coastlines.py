@@ -74,7 +74,9 @@ if __name__ == "__main__":
 
     print(f"해안선 비교 설정 파일 불러오기에 성공하였습니다.")
 
-    coastline_gap_visualize(mat, params, init_coastlines, line_size, line_min_length, before_color, after_color, compare_color, targets, args.plot, args.save_dir)
-    if args.save_dir is not None:
-        print(f"image saved")
-
+    is_success, msg = coastline_gap_visualize(mat, params, init_coastlines, line_size, line_min_length, before_color, after_color, compare_color, targets, args.plot, args.save_dir)
+    if not is_success:
+        print(f"error : {msg}\n")
+        exit()
+    elif args.save_dir is not None:
+        print(f"Save complete.")

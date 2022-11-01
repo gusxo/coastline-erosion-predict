@@ -11,11 +11,11 @@ if __name__ == "__main__":
     from Rules import rule_main, rule_toppling
     from CellularAutomata import CellularAutomata
     from Utils import load_inited_matrix, save_inited_matrix
-    from Visualize import save_mat_with_visualize, 
+    from Visualize import save_mat_with_visualize, coastline_gap_visualize
     from ReadConfig import ReadCompareConfig
 
     desc = "details"
-    usage_msg = f"{sys.argv[0]} RUN_STEPS LOAD_DIR [-s SAVE_DIR] [--store_images [--line_size LINE_SIZE]] [--save_per_steps SAVE_STEPS]"
+    usage_msg = f"{sys.argv[0]} RUN_STEPS LOAD_DIR [-s SAVE_DIR] [--store_images [--line_size LINE_SIZE]] [--compare_coastlines COMPARE_CONFIG] [--save_per_steps SAVE_STEPS]"
     parser = argparse.ArgumentParser(description=desc,usage=usage_msg,
     formatter_class=argparse.RawTextHelpFormatter)
 
@@ -50,6 +50,15 @@ if __name__ == "__main__":
     --store_images 옵션 사용시에만 작동합니다.
     matrix_coastline_cells 이미지의 빨간선 크기를 결정합니다.
     기본값은 1입니다.
+
+    """)
+
+    parser.add_argument("--compare_coastlines", dest="COMPARE_CONFIG", action="store", help="""
+    해안선 비교 설정 파일을 지정하여, 초기 해안선(지도 초기화 직후)과 CA 적용 후 해안선을 비교합니다.
+    SAVE_PER_STEPS 옵션을 같이 지정할 시, 중간 결과 저장시 마다 해안선 비교를 수행합니다.
+    
+    파일 형식은 make_compare_config.py로 얻을 수 있습니다.
+    check_compare_config.py로 체크 하였을때 성공한 파일이여야 합니다.
 
     """)
 
@@ -148,6 +157,13 @@ if __name__ == "__main__":
                         print(f"error : {msg}\n중간 이미지 파일 저장에 실패했습니다.")
                         exit()
 
+                #save - compare coastlines
+                if args.compare_config is not None:
+                    is_success, msg = coastline_gap_visualize(mat, params, init_coastlines, line_size, line_min_length, before_color, after_color, compare_color, targets, False, save_dir)
+                    if not is_success:
+                        print(f"error : {msg}\n중간 해안선 비교 파일 저장에 실패했습니다.")
+                        exit()
+
     mat = CA.mat
     #save
     save_dir = args.save_dir
@@ -166,3 +182,12 @@ if __name__ == "__main__":
             exit()
         else:
             print(f"이미지 파일 저장에 성공했습니다. : {save_dir}")
+
+    #save - compare coastlines
+    if args.compare_config is not None:
+        is_success, msg = coastline_gap_visualize(mat, params, init_coastlines, line_size, line_min_length, before_color, after_color, compare_color, targets, False, save_dir)
+        if not is_success:
+            print(f"error : {msg}\n중간 해안선 비교 파일 저장에 실패했습니다.")
+            exit()
+        else:
+            print(f"해안선 비교 파일 저장에 성공했습니다. : {save_dir}")
