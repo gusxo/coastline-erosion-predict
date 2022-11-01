@@ -1,12 +1,12 @@
 
 if __name__ == "__main__":
     import argparse
+    import sys
 
     from os.path import dirname, join, abspath
     libpath = abspath(join(dirname(__file__), "../lib"))
     sys.path.insert(0, libpath)
 
-    import sys
     from Utils import load_inited_matrix
     from Visualize import coastline_gap_visualize
     from ReadConfig import ReadCompareConfig
