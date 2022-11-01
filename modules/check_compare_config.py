@@ -11,6 +11,5 @@ if __name__ == "__main__":
     is_success, msg = ReadCompareConfig(filepath)
     if is_success:
         print(f":: Read Config is Success!")
-        print(msg)
     else:
         print(f":: Read Config is Failed...\n{msg}")
