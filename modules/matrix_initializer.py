@@ -7,11 +7,12 @@ if __name__ == "__main__":
     sys.path.insert(0, abspath(join(dirname(__file__), "../lib")))
     from InitParams import ReadAndInitParmas
     from InitMatrix import to_object_type, wave_weight_recv, wave_weight_send, init_active_cells, matrix_init, map_downsize
-    from Utils import convert_axis, get_coastline_cells, load_matrix, load_inited_matrix, save_inited_matrix, save_mat_with_visualize
+    from Utils import convert_axis, get_coastline_cells, load_matrix, load_inited_matrix, save_inited_matrix
+    from Visualize import save_mat_with_visualize
 
     
     desc = "details"
-    usage_msg = f"{sys.argv[0]} (-m MATRIX_FILE -c CONFIG_FILE [-d DOWNSIZE_COUNT] | -l LOAD_DIR) [-w LOOP_RATE] [-s SAVE_DIR] [--store_images]"
+    usage_msg = f"{sys.argv[0]} (-m MATRIX_FILE -c CONFIG_FILE [-d DOWNSIZE_COUNT] | -l LOAD_DIR) [-w LOOP_RATE] [-s SAVE_DIR] [--store_images [--line_size LINE_SIZE]]"
     parser = argparse.ArgumentParser(description=desc, usage=usage_msg,
     formatter_class=argparse.RawTextHelpFormatter)
 
@@ -58,6 +59,13 @@ if __name__ == "__main__":
 
     """)
 
+    parser.add_argument("--line_size", dest="line_size", action="store", type=int, default=1, help="""
+    --store_images 옵션 사용시에만 작동합니다.
+    matrix_coastline_cells 이미지의 빨간선 크기를 결정합니다.
+    기본값은 1입니다.
+
+    """)
+
     args = parser.parse_args()
 
     #LOAD_DIR 옵션이 없을 경우, -m -c 옵션 다있는지 확인
@@ -71,6 +79,9 @@ if __name__ == "__main__":
         exit()
     if args.loop_rate < 0.0:
         print(f"error : (-w | --wave_init) arguments must at least 0, but input is {args.loop_rate}")
+        exit()
+    if args.line_size < 1:
+        print(f"error : (--line_size) arguments must at least 1, but input is {args.line_size}")
         exit()
 
 
@@ -143,7 +154,7 @@ if __name__ == "__main__":
 
     #save - visualize
     if args.visualize:
-        is_success, msg = save_mat_with_visualize(save_dir, inited_matrix, params, init_coastlines)
+        is_success, msg = save_mat_with_visualize(save_dir, inited_matrix, params, init_coastlines, args.line_size)
         if not is_success:
             print(f"error : {msg}\n이미지 파일 저장에 실패했습니다.")
             exit()

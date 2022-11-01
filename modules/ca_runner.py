@@ -8,10 +8,11 @@ if __name__ == "__main__":
     sys.path.insert(0, abspath(join(dirname(__file__), "../lib")))
     from Rules import rule_main, rule_toppling
     from CellularAutomata import CellularAutomata
-    from Utils import load_inited_matrix, save_inited_matrix, save_mat_with_visualize
+    from Utils import load_inited_matrix, save_inited_matrix
+    from Visualize import save_mat_with_visualize
 
     desc = "details"
-    # usage_msg = f"{sys.argv[0]} STEPS LOAD_DIR [-s SAVE_DIR] [--store_images] [--save_per_steps SAVE_STEPS]"
+    usage_msg = f"{sys.argv[0]} RUN_STEPS LOAD_DIR [-s SAVE_DIR] [--store_images [--line_size LINE_SIZE]] [--save_per_steps SAVE_STEPS]"
     parser = argparse.ArgumentParser(description=desc,
     formatter_class=argparse.RawTextHelpFormatter)
 
@@ -42,6 +43,13 @@ if __name__ == "__main__":
 
     """)
 
+    parser.add_argument("--line_size", dest="line_size", action="store", type=int, default=1, help="""
+    --store_images 옵션 사용시에만 작동합니다.
+    matrix_coastline_cells 이미지의 빨간선 크기를 결정합니다.
+    기본값은 1입니다.
+
+    """)
+
     parser.add_argument("--save_per_steps", dest="save_steps", action="store", type=int, help="""
     셀룰러 오토마타가 최종 결과 외에도 <SAVE_STEPS> 스텝 마다 중간 결과를 저장합니다.
     중간 결과 저장은 <SAVE_DIR>/<STEPS> 디렉토리에 이루어 집니다.
@@ -57,6 +65,9 @@ if __name__ == "__main__":
         if args.save_steps < 1:
             print(f"error : save_steps arguments must at least 1, but input is {args.save_steps}")
             exit()
+    if args.line_size < 1:
+        print(f"error : line_size arguments must at least 1, but input is {args.line_size}")
+        exit()
 
     #load
     is_success, msg_or_data = load_inited_matrix(args.load_dir)
@@ -114,7 +125,7 @@ if __name__ == "__main__":
 
                 #save - visualize
                 if args.visualize:
-                    is_success, msg = save_mat_with_visualize(save_dir, mat, params, init_coastlines)
+                    is_success, msg = save_mat_with_visualize(save_dir, mat, params, init_coastlines, args.line_size)
                     if not is_success:
                         print(f"error : {msg}\n중간 이미지 파일 저장에 실패했습니다.")
                         exit()
@@ -131,7 +142,7 @@ if __name__ == "__main__":
 
     #save - visualize
     if args.visualize:
-        is_success, msg = save_mat_with_visualize(save_dir, mat, params, init_coastlines)
+        is_success, msg = save_mat_with_visualize(save_dir, mat, params, init_coastlines, args.line_size)
         if not is_success:
             print(f"error : {msg}\n이미지 파일 저장에 실패했습니다.")
             exit()
