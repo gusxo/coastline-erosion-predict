@@ -87,7 +87,7 @@ def get_coastline_gap_cal(points, mat, direction):
     raise Exception("get_coastline_gap_cal : direction is not valid")
 
   if mat[r,c] == 3:
-    {"from":points, "direction":direction, "to":(r,c), "gap":0}
+    return {"from":points, "direction":direction, "to":(r,c), "gap":0}
 
   add_values = []
   for i in range(4):
@@ -97,25 +97,23 @@ def get_coastline_gap_cal(points, mat, direction):
         add_values += [(add_values[0][0] + add_r[i], add_values[0][1] + add_c[i])]
       elif len(add_values) >= 4:
         raise Exception("error")
-  
   while(True):
     if not range_check(r,c,mat.shape):
-      cnt = -1
-      break
-    cnt+=1
+      return {"from":points, "direction":direction, "to":(r,c), "gap":-1}
+
     for add_r, add_c in add_values:
       next_r = r + add_r
       next_c = c + add_c
-      if not range_check(next_r, next_c, mat.shape):
+      if range_check(next_r, next_c, mat.shape):
         if mat[next_r, next_c] == 2:
           r = next_r
           c = next_c
-          break
+          return {"from":points, "direction":direction, "to":(next_r, next_c), "gap":cnt+1}
     r += add_values[-1][0]
     c += add_values[-1][1]
+    cnt+=1
 
 
-  return {"from":points, "direction":direction, "to":(r,c), "gap":cnt}
 
 def get_coastline_gap(before_coastline, after_coastline, base_points, compare_dirs, rules="all"):
   """
@@ -164,14 +162,14 @@ def get_coastline_gap(before_coastline, after_coastline, base_points, compare_di
       for index in indexs[0]:
         compare_start_points_r += [r]
         compare_start_points_c += [index]
-      else:
-        compare_start_points_r += [r]
-        compare_start_points_c += [c]
+    else:
+      compare_start_points_r += [r]
+      compare_start_points_c += [c]
     #시작 포인트 다수일 경우를 대비해 규칙 적용
     cnt = len(compare_start_points_r)
     if rules == "all":
-      for i in range(cnt):
-        result += [get_coastline_gap_cal((compare_start_points_r[i], compare_start_points_c[i]), mat, compare_dirs[i])]
+      for k in range(cnt):
+        result += [get_coastline_gap_cal((compare_start_points_r[k], compare_start_points_c[k]), mat, compare_dirs[i])]
     elif rules == "min":
       result += [get_coastline_gap_cal((np.min(compare_start_points_r), np.min(compare_start_points_c)), mat, compare_dirs[i])]
     elif rules == "max":
@@ -226,15 +224,6 @@ def save_imgs(dir, filenames, imgs):
     return False, f"save visualized images : save failed : {e}"
   return True, None
 
-def save_mat_with_visualize(dir, mat, params, init_coastlines, line_size):
-  img_mat = to_img(mat, params["max_depth"], params["max_depth"]//6)
-  img_active_cells = marking_active_cells(to_img(mat,params["max_depth"], params["max_depth"]//6),params)
-  img_coastline_cells = marking_coastline_cells(to_img(mat,params["max_depth"], params["max_depth"]//6),init_coastlines, size=line_size)
-  img_weight = weight_to_img(mat)
-  imgs = [img_mat, img_active_cells, img_coastline_cells, img_weight]
-  names = ["matrix", "matrix_active_cells", "matrix_coastline_cells", "matrix_weight"]
-  return save_imgs(dir, names, imgs)
-
 def coastline_gap_visualize(mat, params, init_coastlines, line_size, line_min_length, before_color, after_color, compare_color, targets, plot=False, save_dir=None):
 
   after_coastlines = get_coastline_cells(mat)
@@ -245,11 +234,10 @@ def coastline_gap_visualize(mat, params, init_coastlines, line_size, line_min_le
 
   valid_info = []
   for i in range(len(targets)):
-    gap_info = get_coastline_gap(init_coastlines, after_coastlines,targets[i][0:2] ,targets[i][2], allow_gap=0, rules=targets[i][3])
-    
+    gap_info = get_coastline_gap(init_coastlines, after_coastlines,[targets[i][0:2]] ,[targets[i][2]], rules=targets[i][3])
     for j in range(len(gap_info)):
       if gap_info[j]["gap"] == -1:
-        gap_info[j] = get_coastline_gap(init_coastlines, after_coastlines,gap_info[j]["from"] ,~targets[i][2], allow_gap=0)
+        gap_info[j] = get_coastline_gap(init_coastlines, after_coastlines,[gap_info[j]["from"]] ,[~targets[i][2]])[0]
         if gap_info[j]["gap"] != -1:
           gap_info[j]["gap"] *= -1
           valid_info += [gap_info[j]]
@@ -268,14 +256,14 @@ def coastline_gap_visualize(mat, params, init_coastlines, line_size, line_min_le
     dirs = [0b1000, 0b0100, 0b0010, 0b0001]
     dirs_txt = ["N", "W", "S", "E"]
     direction_txt = ""
-    for i in range(4):
-      if direction & dirs[i]:
-        r += add_r[i] * -1 * (line_min_length // 2)
-        c += add_c[i] * -1 * (line_min_length // 2)
-        direction_txt += dirs_txt[i]
+    for j in range(4):
+      if direction & dirs[j]:
+        r += add_r[j] * -1 * (line_min_length // 2)
+        c += add_c[j] * -1 * (line_min_length // 2)
+        direction_txt += dirs_txt[j]
     _ = marking_line(_, (r,c), direction, gaps["gap"]+line_min_length, size=line_size, color=compare_color)
-    diff = int(params["cell_length"] * gaps["gap"] * (math.sqrt(2) if gaps["gap"] < 0 else 1))
-    info_txt += f"Line {i+1}\nBefore-Coastline-Point: {r} {c}\nAfter-Coastline-Point: {gaps['to'][0]} {gaps['to'][1]}\n"
+    diff = int(params["cell_length"] * gaps["gap"] * (math.sqrt(2) if len(direction_txt) >= 2 else 1))
+    info_txt += f"Line {i+1}\nBefore-Coastline-Point: {gaps['from'][0]} {gaps['from'][1]}\nAfter-Coastline-Point: {gaps['to'][0]} {gaps['to'][1]}\n"
     info_txt += f"Compare-Dir: {direction_txt}\nDiff: {diff/1000} m\n"
 
 
@@ -287,7 +275,7 @@ def coastline_gap_visualize(mat, params, init_coastlines, line_size, line_min_le
       #디렉토리 확인 후 생성
       if not os.path.isdir(f'{save_dir}'):
         os.makedirs(f'{save_dir}')
-      im = Image.fromarray((_[i] * 255).astype(np.uint8))
+      im = Image.fromarray((_ * 255).astype(np.uint8))
       im.save(f"{save_dir}/compare_coastline.png")
     except Exception as e:
           raise Exception(f"save results images failed : {e}")
