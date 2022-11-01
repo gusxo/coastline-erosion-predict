@@ -5,7 +5,7 @@ if __name__ == "__main__":
         print(f"usages : {sys.argv[0]} <config_file_path>")
         exit()
 
-    filepath = sys.argv[1]
+    filepath = f"{sys.argv[1]}.txt"
 
     f = open(filepath, "w", encoding='utf8')
     default_config_str = """
