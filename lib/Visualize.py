@@ -1,7 +1,9 @@
 import numpy as np
 import os
 from PIL import Image
-from Utils import range_check
+from Utils import range_check, get_coastline_cells
+import matplotlib.pyplot as plt
+
 
 def to_img(mat, center, interval):
   sedi_mat = np.zeros_like(mat)
@@ -192,3 +194,47 @@ def save_mat_with_visualize(dir, mat, params, init_coastlines, line_size):
     imgs = [img_mat, img_active_cells, img_coastline_cells, img_weight]
     names = ["matrix", "matrix_active_cells", "matrix_coastline_cells", "matrix_weight"]
     return save_imgs(dir, names, imgs)
+
+def coastline_gap_visualize(mat, params, init_coastlines, line_size, line_min_length, before_color, after_color, compare_color, targets, plot=False, save_path=None):
+
+    after_coastlines = get_coastline_cells(mat)
+
+    _ = to_img(mat,params["max_depth"], params["max_depth"]//6)
+    _ = marking_coastline_cells(_, init_coastlines, size=line_size, color = before_color)
+    _ = marking_coastline_cells(_, after_coastlines, size=line_size, color=after_color)
+
+    valid_info = []
+    for i in range(len(targets)):
+        gap_info = get_coastline_gap(init_coastlines, after_coastlines,targets[i][0:2] ,targets[i][2], allow_gap=0, rules=targets[i][3])
+        
+        for j in range(len(gap_info)):
+            if gap_info[j]["gap"] == -1:
+                gap_info[j] = get_coastline_gap(init_coastlines, after_coastlines,gap_info[j]["from"] ,~targets[i][2], allow_gap=0)
+                if gap_info[j]["gap"] != -1:
+                    gap_info[j]["gap"] *= -1
+                    valid_info += [gap_info[j]]
+            else:
+                valid_info += [gap_info[j]]
+
+    for gaps in valid_info:
+        r, c = gaps["from"]
+        direction = gaps["direction"]
+        add_r = [-1, 0, 1, 0]
+        add_c = [0, -1, 0, 1]
+        dirs = [0b1000, 0b0100, 0b0010, 0b0001]
+        for i in range(4):
+            if direction & dirs[i]:
+                r += add_r[i] * -1 * (line_min_length // 2)
+                c += add_c[i] * -1 * (line_min_length // 2)
+        _ = marking_line(_, (r,c), direction, gaps["gap"]+line_min_length, size=line_size, color=compare_color)
+
+    if plot:
+        plt.imshow(_)
+    if save_path is not None:
+        try:
+            im = Image.fromarray((_[i] * 255).astype(np.uint8))
+            im.save(f"{save_path}.png")
+        except Exception as e:
+            raise Exception(f"save visualized images : save failed : {e}")
+
+    return _
