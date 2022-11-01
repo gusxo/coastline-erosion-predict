@@ -3,7 +3,7 @@ import os
 from PIL import Image
 from Utils import range_check, get_coastline_cells
 import matplotlib.pyplot as plt
-
+import math
 
 def to_img(mat, center, interval):
   sedi_mat = np.zeros_like(mat)
@@ -74,28 +74,50 @@ def marking_line(im_mat, start, direction, length, size=1, color=[1,1,1]):
         c += add_c[i]
   return im_mat
 
-def get_coastline_gap_cal(points, mat, direction, allow_gap):
+def get_coastline_gap_cal(points, mat, direction):
   r, c = points
   cnt = 0
   add_r = [-1, 0, 1, 0]
   add_c = [0, -1, 0, 1]
   dirs = [0b1000, 0b0100, 0b0010, 0b0001]
+  ban_dirs = [0b1010, 0b0101]
   direction = direction & 0b1111
+
+  if (direction & ban_dirs[0]) == ban_dirs[0] or (direction & ban_dirs[1]) == ban_dirs[1]:
+    raise Exception("get_coastline_gap_cal : direction is not valid")
+
+  if mat[r,c] == 3:
+    {"from":points, "direction":direction, "to":(r,c), "gap":0}
+
+  add_values = []
+  for i in range(4):
+    if direction & dirs[i]:
+      add_values += [(add_r[i], add_c[i])]
+      if len(add_values) == 2:
+        add_values += [(add_values[0][0] + add_r[i], add_values[0][1] + add_c[i])]
+      elif len(add_values) >= 4:
+        raise Exception("error")
+  
   while(True):
     if not range_check(r,c,mat.shape):
       cnt = -1
       break
-    mask = (mat[max([0, r-allow_gap]):r+1+allow_gap, max([0, c-allow_gap]):c+1+allow_gap] & 2)
-    if np.sum(mask):
-      break
-    for i in range(4):
-      if direction & dirs[i]:
-        r += add_r[i]
-        c += add_c[i]
     cnt+=1
+    for add_r, add_c in add_values:
+      next_r = r + add_r
+      next_c = c + add_c
+      if not range_check(next_r, next_c, mat.shape):
+        if mat[next_r, next_c] == 2:
+          r = next_r
+          c = next_c
+          break
+    r += add_values[-1][0]
+    c += add_values[-1][1]
+
+
   return {"from":points, "direction":direction, "to":(r,c), "gap":cnt}
 
-def get_coastline_gap(before_coastline, after_coastline, base_points, compare_dirs, allow_gap = 0):
+def get_coastline_gap(before_coastline, after_coastline, base_points, compare_dirs, rules="all"):
   """
   before_coastline : get_coastline_cells()로 얻은 set
   after_coastline : get_coastline_cells()로 얻은 set
@@ -104,7 +126,6 @@ def get_coastline_gap(before_coastline, after_coastline, base_points, compare_di
   compare_dirs : base_points 좌표에서 어느 방향으로 거리를 잴것인지 지정하는 int의 리스트
                   방향 지정 방법 : 0bxxxx, bitmask 형태로 각각 북/서/남/동 flag
                   ex : 북서는 0b1100, 남은 0b0010
-  allow_gap : 허용 오차, after_coastline과의 거리를 잴 때 allow_gap 만큼의 차이가 나더라도 맞는것으로 처리함
   """
   
   result = []
@@ -127,20 +148,39 @@ def get_coastline_gap(before_coastline, after_coastline, base_points, compare_di
     
   for i in range(len(base_points)):
     r, c = base_points[i]
+    compare_start_points_r = []
+    compare_start_points_c = []
     if r < 0 and c < 0:
       raise Exception("base_points : x, y 좌표를 둘 다 음수로 지정할 수 없습니다.")
     elif r < 0:
       target_mask = (mat[:,c] & 1)
       indexs = np.where(target_mask)
       for index in indexs[0]:
-        result += [get_coastline_gap_cal((index, c), mat, compare_dirs[i], allow_gap)]
+        compare_start_points_r += [index]
+        compare_start_points_c += [c]
     elif c < 0:
       target_mask = (mat[r, :] & 1)
       indexs = np.where(target_mask)
       for index in indexs[0]:
-        result += [get_coastline_gap_cal((r, index), mat, compare_dirs[i], allow_gap)]
+        compare_start_points_r += [r]
+        compare_start_points_c += [index]
+      else:
+        compare_start_points_r += [r]
+        compare_start_points_c += [c]
+    #시작 포인트 다수일 경우를 대비해 규칙 적용
+    cnt = len(compare_start_points_r)
+    if rules == "all":
+      for i in range(cnt):
+        result += [get_coastline_gap_cal((compare_start_points_r[i], compare_start_points_c[i]), mat, compare_dirs[i])]
+    elif rules == "min":
+      result += [get_coastline_gap_cal((np.min(compare_start_points_r), np.min(compare_start_points_c)), mat, compare_dirs[i])]
+    elif rules == "max":
+      result += [get_coastline_gap_cal((np.max(compare_start_points_r), np.max(compare_start_points_c)), mat, compare_dirs[i])]
+    elif rules == "mean":
+      result += [get_coastline_gap_cal((int(np.mean(compare_start_points_r)), int(np.mean(compare_start_points_c))), mat, compare_dirs[i])]
     else:
-      result += [get_coastline_gap_cal((r, c), mat, compare_dirs[i], allow_gap)]
+      raise Exception("get_coastline_gap : rules parameter is not valid")
+
   return result
   
 
@@ -187,54 +227,75 @@ def save_imgs(dir, filenames, imgs):
   return True, None
 
 def save_mat_with_visualize(dir, mat, params, init_coastlines, line_size):
-    img_mat = to_img(mat, params["max_depth"], params["max_depth"]//6)
-    img_active_cells = marking_active_cells(to_img(mat,params["max_depth"], params["max_depth"]//6),params)
-    img_coastline_cells = marking_coastline_cells(to_img(mat,params["max_depth"], params["max_depth"]//6),init_coastlines, size=line_size)
-    img_weight = weight_to_img(mat)
-    imgs = [img_mat, img_active_cells, img_coastline_cells, img_weight]
-    names = ["matrix", "matrix_active_cells", "matrix_coastline_cells", "matrix_weight"]
-    return save_imgs(dir, names, imgs)
+  img_mat = to_img(mat, params["max_depth"], params["max_depth"]//6)
+  img_active_cells = marking_active_cells(to_img(mat,params["max_depth"], params["max_depth"]//6),params)
+  img_coastline_cells = marking_coastline_cells(to_img(mat,params["max_depth"], params["max_depth"]//6),init_coastlines, size=line_size)
+  img_weight = weight_to_img(mat)
+  imgs = [img_mat, img_active_cells, img_coastline_cells, img_weight]
+  names = ["matrix", "matrix_active_cells", "matrix_coastline_cells", "matrix_weight"]
+  return save_imgs(dir, names, imgs)
 
-def coastline_gap_visualize(mat, params, init_coastlines, line_size, line_min_length, before_color, after_color, compare_color, targets, plot=False, save_path=None):
+def coastline_gap_visualize(mat, params, init_coastlines, line_size, line_min_length, before_color, after_color, compare_color, targets, plot=False, save_dir=None):
 
-    after_coastlines = get_coastline_cells(mat)
+  after_coastlines = get_coastline_cells(mat)
 
-    _ = to_img(mat,params["max_depth"], params["max_depth"]//6)
-    _ = marking_coastline_cells(_, init_coastlines, size=line_size, color = before_color)
-    _ = marking_coastline_cells(_, after_coastlines, size=line_size, color=after_color)
+  _ = to_img(mat,params["max_depth"], params["max_depth"]//6)
+  _ = marking_coastline_cells(_, init_coastlines, size=line_size, color = before_color)
+  _ = marking_coastline_cells(_, after_coastlines, size=line_size, color=after_color)
 
-    valid_info = []
-    for i in range(len(targets)):
-        gap_info = get_coastline_gap(init_coastlines, after_coastlines,targets[i][0:2] ,targets[i][2], allow_gap=0, rules=targets[i][3])
-        
-        for j in range(len(gap_info)):
-            if gap_info[j]["gap"] == -1:
-                gap_info[j] = get_coastline_gap(init_coastlines, after_coastlines,gap_info[j]["from"] ,~targets[i][2], allow_gap=0)
-                if gap_info[j]["gap"] != -1:
-                    gap_info[j]["gap"] *= -1
-                    valid_info += [gap_info[j]]
-            else:
-                valid_info += [gap_info[j]]
+  valid_info = []
+  for i in range(len(targets)):
+    gap_info = get_coastline_gap(init_coastlines, after_coastlines,targets[i][0:2] ,targets[i][2], allow_gap=0, rules=targets[i][3])
+    
+    for j in range(len(gap_info)):
+      if gap_info[j]["gap"] == -1:
+        gap_info[j] = get_coastline_gap(init_coastlines, after_coastlines,gap_info[j]["from"] ,~targets[i][2], allow_gap=0)
+        if gap_info[j]["gap"] != -1:
+          gap_info[j]["gap"] *= -1
+          valid_info += [gap_info[j]]
+      else:
+        valid_info += [gap_info[j]]
 
-    for gaps in valid_info:
-        r, c = gaps["from"]
-        direction = gaps["direction"]
-        add_r = [-1, 0, 1, 0]
-        add_c = [0, -1, 0, 1]
-        dirs = [0b1000, 0b0100, 0b0010, 0b0001]
-        for i in range(4):
-            if direction & dirs[i]:
-                r += add_r[i] * -1 * (line_min_length // 2)
-                c += add_c[i] * -1 * (line_min_length // 2)
-        _ = marking_line(_, (r,c), direction, gaps["gap"]+line_min_length, size=line_size, color=compare_color)
+  info_txt = ""
+  for i in range(len(valid_info)):
+    gaps = valid_info[i]
+    r, c = gaps["from"]
+    direction = gaps["direction"]
+    if gaps["gap"] < 0:
+      direction = (~direction) & 0b1111
+    add_r = [-1, 0, 1, 0]
+    add_c = [0, -1, 0, 1]
+    dirs = [0b1000, 0b0100, 0b0010, 0b0001]
+    dirs_txt = ["N", "W", "S", "E"]
+    direction_txt = ""
+    for i in range(4):
+      if direction & dirs[i]:
+        r += add_r[i] * -1 * (line_min_length // 2)
+        c += add_c[i] * -1 * (line_min_length // 2)
+        direction_txt += dirs_txt[i]
+    _ = marking_line(_, (r,c), direction, gaps["gap"]+line_min_length, size=line_size, color=compare_color)
+    diff = int(params["cell_length"] * gaps["gap"] * (math.sqrt(2) if gaps["gap"] < 0 else 1))
+    info_txt += f"Line {i+1}\nBefore-Coastline-Point: {r} {c}\nAfter-Coastline-Point: {gaps['to'][0]} {gaps['to'][1]}\n"
+    info_txt += f"Compare-Dir: {direction_txt}\nDiff: {diff/1000} m\n"
 
-    if plot:
-        plt.imshow(_)
-    if save_path is not None:
-        try:
-            im = Image.fromarray((_[i] * 255).astype(np.uint8))
-            im.save(f"{save_path}.png")
-        except Exception as e:
-            raise Exception(f"save visualized images : save failed : {e}")
 
-    return _
+  if plot:
+    plt.imshow(_)
+    print(info_txt)
+  if save_dir is not None:
+    try:
+      #디렉토리 확인 후 생성
+      if not os.path.isdir(f'{save_dir}'):
+        os.makedirs(f'{save_dir}')
+      im = Image.fromarray((_[i] * 255).astype(np.uint8))
+      im.save(f"{save_dir}/compare_coastline.png")
+    except Exception as e:
+          raise Exception(f"save results images failed : {e}")
+    try:
+      f = open(f"{save_dir}/compare_info.txt", "w", encoding='utf8')
+      f.write(info_txt)
+      f.close()
+    except Exception as e:
+      raise Exception(f"save results info failed : {e}")
+
+  return _
