@@ -248,7 +248,6 @@ def coastline_gap_visualize(mat, params, init_coastlines, line_size, line_min_le
       if gap_info[j]["gap"] == -1:
         gap_info[j] = get_coastline_gap(init_coastlines, after_coastlines,[gap_info[j]["from"]] ,[~targets[i][2]])[0]
         if gap_info[j]["gap"] != -1:
-          gap_info[j]["gap"] *= -1
           valid_info += [gap_info[j]]
       else:
         valid_info += [gap_info[j]]
@@ -269,10 +268,10 @@ def coastline_gap_visualize(mat, params, init_coastlines, line_size, line_min_le
         r += add_r[j] * -1 * (line_min_length // 2)
         c += add_c[j] * -1 * (line_min_length // 2)
         direction_txt += dirs_txt[j]
-    _ = marking_line(_, (r,c), direction, abs(gaps["gap"])+line_min_length, size=line_size, color=compare_color)
-    diff = int(params["cell_length"] * gaps["gap"] * (math.sqrt(2) if len(direction_txt) >= 2 else 1))
+    _ = marking_line(_, (r,c), direction, gaps["gap"]+ line_min_length, size=line_size, color=compare_color)
+    diff = int(params["cell_length"] * math.sqrt(((gaps["from"][0] - gaps["to"][0]) ** 2) + ((gaps["from"][1] - gaps["to"][1]) ** 2))) / 1000
     info_txt += f"Line {i+1}\nBefore-Coastline-Point: {gaps['from'][0]} {gaps['from'][1]}\nAfter-Coastline-Point: {gaps['to'][0]} {gaps['to'][1]}\n"
-    info_txt += f"Compare-Dir: {direction_txt}\nDiff: {diff/1000} m\n"
+    info_txt += f"Compare-Dir: {direction_txt}\nDiff: {diff} m\n"
 
 
   if plot:
