@@ -1,0 +1,15 @@
+#해운대 해수욕장 (matrix_file/sea.npy) 용
+
+set line_min_length 50
+set line_size 2
+set line_color before 255 0 0
+set line_color after 0 255 0
+set line_color compare 255 255 0
+
+set -1 100 bitmask 0b1100 mean
+set -1 200 bitmask 0b1100 mean
+set -1 300 bitmask 0b1100 mean
+set -1 400 bitmask 0b1100 mean
+set -1 500 bitmask 0b1100 mean
+set -1 600 bitmask 0b1100 mean
+set -1 700 bitmask 0b1100 mean
