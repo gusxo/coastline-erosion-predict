@@ -1,12 +1,8 @@
 if __name__ == "__main__":
     import sys
 
-    from os.path import dirname, join, abspath
-    libpath = abspath(join(dirname(__file__), "../lib"))
-    sys.path.insert(0, libpath)
-
-    from ReadConfig import ReadConfig
-    from InitParams import ReadAndInitParmas
+    from lib.ReadConfig import ReadConfig
+    from lib.InitParams import ReadAndInitParmas
 
     if len(sys.argv) < 2:
         print(f"usages : {sys.argv[0]} <config_file_path>")

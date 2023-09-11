@@ -3,13 +3,9 @@ if __name__ == "__main__":
     import argparse
     import sys
 
-    from os.path import dirname, join, abspath
-    libpath = abspath(join(dirname(__file__), "../lib"))
-    sys.path.insert(0, libpath)
-
-    from Utils import load_inited_matrix
-    from Visualize import coastline_gap_visualize
-    from ReadConfig import ReadCompareConfig
+    from lib.Utils import load_inited_matrix
+    from lib.Visualize import coastline_gap_visualize
+    from lib.ReadConfig import ReadCompareConfig
 
     desc = "details"
     usage_msg = f"{sys.argv[0]} [-h] (-s SAVE_DIR | -p) LOAD_DIR COMPARE_CONFIG"

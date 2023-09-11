@@ -3,14 +3,11 @@ if __name__ == "__main__":
     from tqdm import tqdm
     import sys
 
-    from os.path import dirname, join, abspath
-    libpath = abspath(join(dirname(__file__), "../lib"))
-    sys.path.insert(0, libpath)
 
-    from InitParams import ReadAndInitParmas
-    from InitMatrix import to_object_type, wave_weight_recv, wave_weight_send, init_active_cells, matrix_init, map_downsize
-    from Utils import convert_axis, get_coastline_cells, load_matrix, load_inited_matrix, save_inited_matrix
-    from Visualize import save_mat_with_visualize
+    from lib.InitParams import ReadAndInitParmas
+    from lib.InitMatrix import to_object_type, wave_weight_recv, wave_weight_send, init_active_cells, matrix_init, map_downsize
+    from lib.Utils import convert_axis, get_coastline_cells, load_matrix, load_inited_matrix, save_inited_matrix
+    from lib.Visualize import save_mat_with_visualize
 
     
     desc = "details"

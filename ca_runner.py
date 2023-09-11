@@ -4,15 +4,12 @@ if __name__ == "__main__":
     import numpy as np
 
     import sys
-    from os.path import dirname, join, abspath
-    libpath = abspath(join(dirname(__file__), "../lib"))
-    sys.path.insert(0, libpath)    
-
-    from Rules import rule_main, rule_toppling
-    from CellularAutomata import CellularAutomata
-    from Utils import load_inited_matrix, save_inited_matrix
-    from Visualize import save_mat_with_visualize, coastline_gap_visualize
-    from ReadConfig import ReadCompareConfig
+    
+    from lib.Rules import rule_main, rule_toppling
+    from lib.CellularAutomata import CellularAutomata
+    from lib.Utils import load_inited_matrix, save_inited_matrix
+    from lib.Visualize import save_mat_with_visualize, coastline_gap_visualize
+    from lib.ReadConfig import ReadCompareConfig
 
     desc = "details"
     usage_msg = f"{sys.argv[0]} RUN_STEPS LOAD_DIR [-h] [-s SAVE_DIR] [--store_images [--line_size LINE_SIZE]] [--compare_coastlines COMPARE_CONFIG] [--save_per_steps SAVE_STEPS]"
