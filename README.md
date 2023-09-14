@@ -1,7 +1,7 @@
 # coastline-erosion-predict
 해안침식 시뮬레이션 프로그램
 
-![flowchart](./flowchart.png)
+![flowchart](./img/flowchart.png)
 
 # Data
 해양수산부 - 연안포털 - 2020년도 현황도/관리도
