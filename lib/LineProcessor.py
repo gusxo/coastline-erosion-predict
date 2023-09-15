@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from collections import deque
+import matplotlib.pyplot as plt
 
 # 점 두개 사이를 보간함
 # p1 : 시작 점, [x, y] 로 이루어짐
@@ -213,3 +214,76 @@ def cutting(data, x_range, y_range):
       result = result + [np.array(tmpline)]
   return result
 
+def img_matrix_lines(mat):
+  im_mat = np.ones((mat.shape[0], mat.shape[1], 3))
+  
+  #해안선 값은 1임
+  mask = (mat == 1)
+  im_mat[mask] = [0,0,0]
+    
+  return im_mat
+
+def img_matrix_areas(mat):
+  im_mat = np.ones((mat.shape[0], mat.shape[1], 3))
+  
+  #지상 영역 색칠
+  mask = (mat == 0)
+  im_mat[mask] = [1, 2/3, 0]
+
+  #바다 영역 색칠
+  mask = (mat == 1)
+  im_mat[mask] = [0, 0, 1]
+
+  #바다 영역 색칠
+  mask = (mat == 2)
+  im_mat[mask] = [2/3, 2/3, 2/3]
+    
+  return im_mat
+
+#영역 확장
+#dir : 0 / 1 / 2 / 3 : 북 / 서 / 남 / 동
+def expand_mat(mat, dir:int, length:int, fill_value = None):
+  if dir < 0 or dir > 3 or length < 0:
+    raise Exception("parameter error")
+  if dir == 0:
+    new_mat = np.zeros((mat.shape[0]+ length, mat.shape[1])).astype(int)
+    new_mat[length:,:] = mat
+    if fill_value is not None:
+      new_mat[:length, :] = fill_value
+    else:
+      for i in range(mat.shape[1]):
+        new_mat[:length, i] = mat[0, i]
+  elif dir == 1:
+    new_mat = np.zeros((mat.shape[0], mat.shape[1] + length)).astype(int)
+    new_mat[:,length:] = mat
+    if fill_value is not None:
+      new_mat[:, :length] = fill_value
+    else:
+      for i in range(mat.shape[0]):
+        new_mat[i, :length] = mat[i, 0]
+  elif dir == 2:
+    new_mat = np.zeros((mat.shape[0] + length, mat.shape[1])).astype(int)
+    new_mat[:mat.shape[0],:] = mat
+    if fill_value is not None:
+      new_mat[mat.shape[0]:, :] = fill_value
+    else:
+      for i in range(mat.shape[1]):
+        new_mat[mat.shape[0]:, i] = mat[-1,i]
+  elif dir == 3:
+    new_mat = np.zeros((mat.shape[0], mat.shape[1] + length)).astype(int)
+    new_mat[:,:mat.shape[1]] = mat
+    if fill_value is not None:
+      new_mat[:, mat.shape[1]:] = fill_value
+    else:
+      for i in range(mat.shape[0]):
+        new_mat[i, mat.shape[1]:] = mat[i, -1]
+
+  return new_mat
+
+def img_painting(mat):
+  im_mat = np.ones((mat.shape[0], mat.shape[1], 3))
+  colormap = plt.get_cmap("tab10")
+  cmapfunc = lambda x : list(map(lambda y : int(y * 255), colormap((x%10)/10)[:2]))
+  for i in range(1, np.max(mat)+1):
+    im_mat[(mat == i)] = cmapfunc(i-1) 
+  return im_mat
