@@ -70,9 +70,9 @@ def to_grid(a, x_range = None, y_range = None):
   #return value : (x_range.end - x_range.begin, y_range.end - y_range.begin) 형태의 numpy array
   #               value가 1일 경우 a 에 저장되어있던 좌표 지점이며, 아닐 시 0
   if x_range is None:
-    x_range = (int(np.min(a[:,0])), int(math.ceil(np.max(a[:,0]))))
+    x_range = (int(np.min(a[:,0])), int(np.max(a[:,0]) + 1))
   if y_range is None:
-    y_range = (int(np.min(a[:,1])), int(math.ceil(np.max(a[:,1]))))
+    y_range = (int(np.min(a[:,1])), int(np.max(a[:,1]) + 1))
   print(f'to_grid() : a.shape : {a.shape} / x_range : {x_range} / y_range : {y_range}')
   
   #range 값에 따라 저장할 matrix 생성
