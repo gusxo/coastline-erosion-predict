@@ -283,7 +283,7 @@ def expand_mat(mat, dir:int, length:int, fill_value = None):
 def img_painting(mat):
   im_mat = np.ones((mat.shape[0], mat.shape[1], 3))
   colormap = plt.get_cmap("tab10")
-  cmapfunc = lambda x : list(map(lambda y : int(y * 255), colormap((x%10)/10)[:2]))
+  cmapfunc = lambda x : list(map(lambda y : int(y * 255), colormap((x%10)/10)[:3]))
   for i in range(1, np.max(mat)+1):
     im_mat[(mat == i)] = cmapfunc(i-1) 
   return im_mat
