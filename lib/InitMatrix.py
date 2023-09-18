@@ -16,8 +16,6 @@ def to_object_type(x):
         y[r,c] = {"state":"wall"}
   return y
 
-
-
 #파도/가중치 초기화
 def wave_weight_recv(mat):
   cnt = mat.shape[0] * mat.shape[1]

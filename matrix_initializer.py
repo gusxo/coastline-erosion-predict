@@ -112,7 +112,7 @@ if __name__ == "__main__":
 
         try:
             #init matrix
-            inited_matrix = matrix_init(to_object_type(convert_axis(mat)), params)
+            inited_matrix = matrix_init(to_object_type(mat), params)
 
             #downsizing
             origin_shape = inited_matrix.shape
