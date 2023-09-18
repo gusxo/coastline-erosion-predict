@@ -1,5 +1,5 @@
 import math
-from ReadConfig import ReadConfig
+from .ReadConfig import ReadConfig
 
 def calculate_parameters(parameters):
     result = {}

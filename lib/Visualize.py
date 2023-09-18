@@ -1,7 +1,7 @@
 import numpy as np
 import os
 from PIL import Image
-from Utils import range_check, get_coastline_cells
+from .Utils import range_check, get_coastline_cells
 import matplotlib.pyplot as plt
 import math
 

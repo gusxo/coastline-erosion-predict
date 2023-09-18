@@ -1,7 +1,7 @@
 import numpy as np
 import math
-from Utils import range_check, get_neighboor, get_neighboor8
-from InitParams import calculate_parameters
+from .Utils import range_check, get_neighboor, get_neighboor8
+from .InitParams import calculate_parameters
 
 ### matrix to obj system
 def to_object_type(x):

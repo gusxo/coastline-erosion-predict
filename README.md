@@ -10,5 +10,5 @@
 
 
 # Sample
-Google Colab [노트북 링크](https://colab.research.google.com/drive/1KCdx7AwZugM3dHrnFoCa9UPhvUK_ykDE?usp=sharing)에서 예시 코드를 실행해볼 수 있습니다.
+Google Colab [<노트북 링크>](https://colab.research.google.com/drive/1KCdx7AwZugM3dHrnFoCa9UPhvUK_ykDE?usp=sharing)에서 예시 코드를 실행해볼 수 있습니다.
 

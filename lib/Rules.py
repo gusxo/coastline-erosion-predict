@@ -1,5 +1,5 @@
 import numpy as np
-from Utils import get_neighboor8
+from .Utils import get_neighboor8
 
 #아래 main 함수 내에서 운송물 이동 시 추락값 및 전송값 계산용
 #return : (next_sediments_value, drop_value)
