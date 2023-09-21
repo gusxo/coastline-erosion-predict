@@ -1,5 +1,5 @@
 # coastline-erosion-predict
-해안침식 시뮬레이션 프로그램
+셀룰러 오토마타 기법을 이용한 해안침식 시뮬레이터
 
 ![flowchart](./img/flowchart.png)
 
